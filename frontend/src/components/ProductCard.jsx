@@ -14,8 +14,8 @@ const ProductCard = ({ product }) => {
     rose: '#E1A4A9'
   };
 
-  const colorKeys = Object.keys(product.images);
-  const selectedImage = product.images[selectedColor];
+  const colorKeys = Object.keys(product.colors);
+  const selectedVariant = product.colors[selectedColor];
 
   return (
     <div style={{ border: '1px solid #ccc', borderRadius: '10px', padding: '15px', width: '250px' }}>
@@ -34,7 +34,7 @@ const ProductCard = ({ product }) => {
         {colorKeys.map((color) => (
           <SwiperSlide key={color}>
             <img
-              src={product.images[color]}
+              src={product.colors[color].image}
               alt={product.name}
               width="100%"
               style={{ borderRadius: '10px' }}
@@ -67,26 +67,27 @@ const ProductCard = ({ product }) => {
         ))}
       </div>
 
+      {/* color name */}
       <p style={{ textAlign: 'center', fontWeight: '500', margin: '8px 0' }}>
         {selectedColor.charAt(0).toUpperCase() + selectedColor.slice(1)} Gold
       </p>
 
-      {/* Yıldızlar */}
+      {/* Rating */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', marginBottom: '10px' }}>
         {Array.from({ length: 5 }).map((_, i) => (
           <span key={i} style={{ fontSize: '18px', color: '#FFD700' }}>
-            {i + 1 <= Math.floor(product.popularityOutOfFive)
+            {i + 1 <= Math.floor(selectedVariant.popularityOutOfFive)
               ? '★'
-              : i < product.popularityOutOfFive
+              : i < selectedVariant.popularityOutOfFive
               ? '⯪'
               : '☆'}
           </span>
         ))}
-        <span style={{ fontWeight: '500' }}>{product.popularityOutOfFive}/5</span>
+        <span style={{ fontWeight: '500' }}>{selectedVariant.popularityOutOfFive}/5</span>
       </div>
 
       <h3>{product.name}</h3>
-      <p><strong>Price:</strong> {product.price} USD</p>
+      <p><strong>Price:</strong> {selectedVariant.price} USD</p>
     </div>
   );
 };
