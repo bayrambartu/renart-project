@@ -1,22 +1,42 @@
 [
-    {
-      "name": "Elegant Necklace",
-      "popularityScore": 87,
-      "weight": 10,
-      "images": {
-        "yellow": "https://dummyimage.com/300x300/e6ca97/000000&text=Yellow+Gold",
-        "white": "https://dummyimage.com/300x300/d9d9d9/000000&text=White+Gold",
-        "rose": "https://dummyimage.com/300x300/e1a4a9/000000&text=Rose+Gold"
-      }
-    },
-    {
-      "name": "Classic Bracelet",
-      "popularityScore": 50,
-      "weight": 7,
-      "images": {
-        "yellow": "https://dummyimage.com/300x300/e6ca97/000000&text=Yellow+Gold",
-        "white": "https://dummyimage.com/300x300/d9d9d9/000000&text=White+Gold",
-        "rose": "https://dummyimage.com/300x300/e1a4a9/000000&text=Rose+Gold"
+  {
+    "name": "Elegant Necklace",
+    "colors": {
+      "yellow": {
+        "popularityScore": 90,
+        "weight": 10,
+        "image": "https://images.unsplash.com/photo-1619119069152-a2b331eb392a?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      },
+      "white": {
+        "popularityScore": 85,
+        "weight": 9,
+        "image": "https://images.unsplash.com/photo-1588444837495-c6cfeb53f32d?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      },
+      "rose": {
+        "popularityScore": 80,
+        "weight": 11,
+        "image": "https://images.unsplash.com/photo-1676329945867-01c9975aa9d1?q=80&w=1233&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
       }
     }
-  ]
+  },
+  {
+    "name": "Classic Bracelet",
+    "colors": {
+      "yellow": {
+        "popularityScore": 55,
+        "weight": 7,
+        "image": "https://images.unsplash.com/photo-1589128777073-263566ae5e4d?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      },
+      "white": {
+        "popularityScore": 50,
+        "weight": 6,
+        "image": "https://images.unsplash.com/photo-1676291055501-286c48bb186f?q=80&w=1290&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      },
+      "rose": {
+        "popularityScore": 45,
+        "weight": 8,
+        "image": "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      }
+    }
+  }
+]
