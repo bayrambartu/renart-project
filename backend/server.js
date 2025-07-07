@@ -7,10 +7,17 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors({
-  origin: [
-    "https://renart-project.vercel.app",
-    "https://renart-project-git-main-bayrambartus-projects.vercel.app"
-  ]
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      "https://renart-project.vercel.app",
+      "https://renart-project-n2kpwdp9d-bayrambartus-projects.vercel.app"
+    ];
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  }
 }));
 
 const products = require('./products.json');
