@@ -6,22 +6,35 @@ const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// --- YENİ KOD ---
 const allowedOrigins = [
-  "https://renart-project.vercel.app",
-  "https://renart-project-n2kpwdp9d-bayrambartus-projects.vercel.app",
-  "https://renart-frontend.vercel.app"
+  "https://renart-project.vercel.app",   // Ana Vercel adresin
+  "https://renart-frontend.vercel.app", // Diğer ana adresin
+  
+  /^https:\/\/renart-project-.*-bayrambartus-projects\.vercel\.app$/,
+  
+  "http://localhost:3000" 
 ];
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin) return callback(null, true);
+
+    const isAllowed = allowedOrigins.some(allowedOrigin => {
+      if (allowedOrigin instanceof RegExp) {
+        return allowedOrigin.test(origin);
+      }
+      return allowedOrigin === origin;
+    });
+
+    if (isAllowed) {
       callback(null, true);
     } else {
-      console.log("CORS reddedildi:", origin); // log ekledim
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error("Bu domaine CORS tarafından izin verilmiyor."));
     }
   }
 }));
+// --- YENİ KOD BİTTİ ---
 
 const products = require('./products.json');
 
