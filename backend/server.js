@@ -1,12 +1,11 @@
+// server.js
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
-
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// 🎯 CORS Origin listesi ve log destekli kontrol
 const allowedOrigins = [
   "https://renart-project.vercel.app",
   "https://renart-frontend.vercel.app",
@@ -16,78 +15,57 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin) {
-      console.log("CORS: Origin boş (muhtemelen Postman veya tarayıcı tabı).");
-      return callback(null, true);
-    }
-
-    const isAllowed = allowedOrigins.some(allowedOrigin => {
-      if (allowedOrigin instanceof RegExp) {
-        return allowedOrigin.test(origin);
-      }
-      return allowedOrigin === origin;
-    });
-
-    if (isAllowed) {
-      console.log("CORS: İzin verildi →", origin);
-      callback(null, true);
-    } else {
-      console.log("CORS: Reddedildi →", origin);
-      callback(new Error("Not allowed by CORS"));
-    }
+    if (!origin) return callback(null, true);
+    const isAllowed = allowedOrigins.some(allowed =>
+      allowed instanceof RegExp ? allowed.test(origin) : allowed === origin
+    );
+    return isAllowed
+      ? callback(null, true)
+      : callback(new Error("Not allowed by CORS"));
   }
 }));
 
-// 📦 Ürün verisi
 const products = require('./products.json');
 
-// 💰 Altın fiyatını API'den çek
 async function fetchGoldPrice() {
   try {
-    const response = await axios.get('https://www.goldapi.io/api/XAU/USD', {
+    const res = await axios.get('https://www.goldapi.io/api/XAU/USD', {
       headers: {
         'x-access-token': process.env.GOLD_API_KEY,
         'Content-Type': 'application/json'
       }
     });
-
-    const pricePerOunce = response.data.price;
-    const pricePerGram = pricePerOunce / 31.1035;
-    return parseFloat(pricePerGram.toFixed(2));
-  } catch (error) {
-    console.error("Altın fiyatı alınamadı:", error.message);
-    return 74.5; // fallback
+    return (res.data.price / 31.1035).toFixed(2);
+  } catch (e) {
+    console.error("Altın fiyatı alınamadı:", e.message);
+    return 74.5;
   }
 }
 
-// 📡 API endpoint
 app.get('/api/products', async (req, res) => {
   const goldPrice = await fetchGoldPrice();
 
   const enrichedProducts = products.map(p => {
-    const price = ((p.popularityScore + 1) * p.weight * goldPrice).toFixed(2);
+    const enrichedColors = {};
+    for (const color in p.colors) {
+      const variant = p.colors[color];
+      const price = ((variant.popularityScore + 1) * variant.weight * goldPrice).toFixed(2);
+      const popularityOutOfFive = (variant.popularityScore / 20).toFixed(1);
+      enrichedColors[color] = {
+        ...variant,
+        price: parseFloat(price),
+        popularityOutOfFive: parseFloat(popularityOutOfFive)
+      };
+    }
     return {
-      ...p,
-      price: parseFloat(price),
-      popularityOutOfFive: parseFloat((p.popularityScore / 20).toFixed(1))
+      name: p.name,
+      colors: enrichedColors
     };
   });
 
-  // 🔍 Filtre parametreleri
-  const minPrice = parseFloat(req.query.minPrice);
-  const maxPrice = parseFloat(req.query.maxPrice);
-  const minPopularity = parseFloat(req.query.minPopularity);
-
-  let filtered = enrichedProducts;
-
-  if (!isNaN(minPrice)) filtered = filtered.filter(p => p.price >= minPrice);
-  if (!isNaN(maxPrice)) filtered = filtered.filter(p => p.price <= maxPrice);
-  if (!isNaN(minPopularity)) filtered = filtered.filter(p => p.popularityOutOfFive >= minPopularity);
-
-  res.json(filtered);
+  res.json(enrichedProducts);
 });
 
-// 🚀 Sunucuyu başlat
 app.listen(PORT, () => {
-  console.log(`✅ Backend server running at http://localhost:${PORT}`);
+  console.log(`✅ Backend running at http://localhost:${PORT}`);
 });
