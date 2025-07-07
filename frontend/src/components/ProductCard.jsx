@@ -14,12 +14,11 @@ const ProductCard = ({ product }) => {
     rose: '#E1A4A9'
   };
 
-  const selectedVariant = product.variants[selectedColor];
-  const colorKeys = Object.keys(product.variants);
+  const colorKeys = Object.keys(product.images);
+  const selectedImage = product.images[selectedColor];
 
   return (
     <div style={{ border: '1px solid #ccc', borderRadius: '10px', padding: '15px', width: '250px' }}>
-      {/* Swiper */}
       <Swiper
         modules={[Navigation]}
         navigation
@@ -34,20 +33,20 @@ const ProductCard = ({ product }) => {
       >
         {colorKeys.map((color) => (
           <SwiperSlide key={color}>
-          <img
-  src={product.variants[color]?.image || ""}
-  alt={product.name}
-  width="100%"
-  style={{ borderRadius: '10px' }}
-  onError={(e) => {
-    e.target.src = 'https://via.placeholder.com/250x250?text=No+Image';
-  }}
-/>
+            <img
+              src={product.images[color]}
+              alt={product.name}
+              width="100%"
+              style={{ borderRadius: '10px' }}
+              onError={(e) => {
+                e.target.src = 'https://via.placeholder.com/250x250?text=No+Image';
+              }}
+            />
           </SwiperSlide>
         ))}
       </Swiper>
 
-      {/* color  dots */}
+      {/* color dots */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '10px' }}>
         {colorKeys.map((color, index) => (
           <div
@@ -68,7 +67,6 @@ const ProductCard = ({ product }) => {
         ))}
       </div>
 
-      {/* name of color  */}
       <p style={{ textAlign: 'center', fontWeight: '500', margin: '8px 0' }}>
         {selectedColor.charAt(0).toUpperCase() + selectedColor.slice(1)} Gold
       </p>
@@ -77,18 +75,18 @@ const ProductCard = ({ product }) => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', marginBottom: '10px' }}>
         {Array.from({ length: 5 }).map((_, i) => (
           <span key={i} style={{ fontSize: '18px', color: '#FFD700' }}>
-            {i + 1 <= Math.floor(selectedVariant.popularityOutOfFive)
+            {i + 1 <= Math.floor(product.popularityOutOfFive)
               ? '★'
-              : i < selectedVariant.popularityOutOfFive
+              : i < product.popularityOutOfFive
               ? '⯪'
               : '☆'}
           </span>
         ))}
-        <span style={{ fontWeight: '500' }}>{selectedVariant.popularityOutOfFive}/5</span>
+        <span style={{ fontWeight: '500' }}>{product.popularityOutOfFive}/5</span>
       </div>
 
       <h3>{product.name}</h3>
-      <p><strong>Fiyat:</strong> {selectedVariant.price}</p>
+      <p><strong>Price:</strong> {product.price} USD</p>
     </div>
   );
 };
