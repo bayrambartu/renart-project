@@ -14,7 +14,7 @@ const ProductCard = ({ product }) => {
     rose: '#E1A4A9'
   };
 
-  const colorKeys = Object.keys(product.colors);
+  const colorKeys = Object.keys(product.colors || {});  
   const selectedVariant = product.colors[selectedColor];
 
   return (
