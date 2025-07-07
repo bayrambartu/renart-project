@@ -7,7 +7,10 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors({
-  origin: '*'
+  origin: [
+    "https://renart-project.vercel.app",
+    "https://renart-project-git-main-bayrambartus-projects.vercel.app"
+  ]
 }));
 
 const products = require('./products.json');
