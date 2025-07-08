@@ -1,3 +1,4 @@
+// ProductCard.jsx
 import React, { useState, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
@@ -5,30 +6,23 @@ import 'swiper/css/navigation';
 import { Navigation } from 'swiper/modules';
 
 const ProductCard = ({ product }) => {
-  const [selectedColor, setSelectedColor] = useState('yellow');
-  const swiperRef = useRef(null);
-
   const colorMap = {
     yellow: '#E6CA97',
     white: '#D9D9D9',
     rose: '#E1A4A9'
   };
 
-  // Backend'den gelen product.images, price, popularityScoreOutOf5 yapısını frontend'de dönüştürüyoruz
-  const transformedColors = {};
-  for (const color of Object.keys(product.images || {})) {
-    transformedColors[color] = {
-      image: product.images[color],
-      price: product.price,
-      popularityOutOfFive: product.popularityScoreOutOf5
-    };
-  }
-
-  const colorKeys = Object.keys(transformedColors);
-  const selectedVariant = transformedColors[selectedColor];
+  const colorKeys = Object.keys(product.images);
+  const [selectedColor, setSelectedColor] = useState(colorKeys[0]);
+  const swiperRef = useRef(null);
 
   return (
-    <div style={{ border: '1px solid #ccc', borderRadius: '10px', padding: '15px', width: '250px' }}>
+    <div style={{
+      border: '1px solid #ccc',
+      borderRadius: '10px',
+      padding: '15px',
+      width: '250px'
+    }}>
       <Swiper
         modules={[Navigation]}
         navigation
@@ -44,7 +38,7 @@ const ProductCard = ({ product }) => {
         {colorKeys.map((color) => (
           <SwiperSlide key={color}>
             <img
-              src={transformedColors[color].image}
+              src={product.images[color]}
               alt={product.name}
               width="100%"
               style={{ borderRadius: '10px' }}
@@ -86,18 +80,18 @@ const ProductCard = ({ product }) => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', marginBottom: '10px' }}>
         {Array.from({ length: 5 }).map((_, i) => (
           <span key={i} style={{ fontSize: '18px', color: '#FFD700' }}>
-            {i + 1 <= Math.floor(selectedVariant.popularityOutOfFive)
+            {i + 1 <= Math.floor(product.popularityScoreOutOf5)
               ? '★'
-              : i < selectedVariant.popularityOutOfFive
+              : i < product.popularityScoreOutOf5
               ? '⯪'
               : '☆'}
           </span>
         ))}
-        <span style={{ fontWeight: '500' }}>{selectedVariant.popularityOutOfFive}/5</span>
+        <span style={{ fontWeight: '500' }}>{product.popularityScoreOutOf5}/5</span>
       </div>
 
       <h3>{product.name}</h3>
-      <p><strong>Price:</strong> {selectedVariant.price} USD</p>
+      <p><strong>Price:</strong> {product.price.toFixed(2)} USD</p>
     </div>
   );
 };
