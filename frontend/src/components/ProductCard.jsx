@@ -14,8 +14,7 @@ const ProductCard = ({ product }) => {
     rose: '#E1A4A9'
   };
 
-  const colorKeys = Object.keys(product.colors || {});
-  const selectedVariant = product.colors?.[selectedColor] || {};
+  const colorKeys = Object.keys(product.images || {});
 
   return (
     <div style={{ border: '1px solid #ccc', borderRadius: '10px', padding: '15px', width: '250px' }}>
@@ -34,8 +33,8 @@ const ProductCard = ({ product }) => {
         {colorKeys.map((color) => (
           <SwiperSlide key={color}>
             <img
-              src={product.colors?.[color]?.image || "https://via.placeholder.com/250x250?text=No+Image"}
-              alt={product.name}
+              src={product.images[color]}
+              alt={`${product.name} - ${color}`}
               width="100%"
               style={{ borderRadius: '10px' }}
               onError={(e) => {
@@ -76,18 +75,18 @@ const ProductCard = ({ product }) => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', marginBottom: '10px' }}>
         {Array.from({ length: 5 }).map((_, i) => (
           <span key={i} style={{ fontSize: '18px', color: '#FFD700' }}>
-            {i + 1 <= Math.floor(selectedVariant?.popularityOutOfFive || 0)
+            {i + 1 <= Math.floor(product.popularityScoreOutOf5)
               ? '★'
-              : i < (selectedVariant?.popularityOutOfFive || 0)
+              : i < product.popularityScoreOutOf5
               ? '⯪'
               : '☆'}
           </span>
         ))}
-        <span style={{ fontWeight: '500' }}>{selectedVariant?.popularityOutOfFive || 0}/5</span>
+        <span style={{ fontWeight: '500' }}>{product.popularityScoreOutOf5}/5</span>
       </div>
 
-      <h3>{product?.name || "Unnamed Product"}</h3>
-      <p><strong>Price:</strong> {selectedVariant?.price !== undefined ? selectedVariant.price : "N/A"} USD</p>
+      <h3>{product.name}</h3>
+      <p><strong>Price:</strong> {product.price} USD</p>
     </div>
   );
 };
