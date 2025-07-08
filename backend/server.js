@@ -67,5 +67,5 @@ app.get('/api/products', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Backend running at http://localhost:${PORT}`);
+  console.log(`Backend running at http://localhost:${PORT}`);
 });
