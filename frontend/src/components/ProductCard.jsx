@@ -1,23 +1,103 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import { Navigation } from 'swiper/modules';
 
 const ProductCard = ({ product }) => {
-  const colors = ['yellow','white','rose'];
-  const [color, setColor] = useState(colors[0]);
-  const img = product.images?.[color] || '';
-  const pop = product.popularityScoreOutOf5 || 0;
-  const price = product.price || 0;
+  const [selectedColor, setSelectedColor] = useState('yellow');
+  const swiperRef = useRef(null);
+
+  const colorMap = {
+    yellow: '#E6CA97',
+    white: '#D9D9D9',
+    rose: '#E1A4A9'
+  };
+
+  // Backend'den gelen product.images, price, popularityScoreOutOf5 yapısını frontend'de dönüştürüyoruz
+  const transformedColors = {};
+  for (const color of Object.keys(product.images || {})) {
+    transformedColors[color] = {
+      image: product.images[color],
+      price: product.price,
+      popularityOutOfFive: product.popularityScoreOutOf5
+    };
+  }
+
+  const colorKeys = Object.keys(transformedColors);
+  const selectedVariant = transformedColors[selectedColor];
 
   return (
-    <div>
-      <img src={img} alt="" width="200"/>
-      <p>{product.name}</p>
-      <p>{price.toFixed(2)} USD</p>
-      <p>{Array.from({ length: 5 }).map((_, i) =>
-        i+1 <= Math.floor(pop) ? '★' : i < pop ? '⯪' : '☆'
-      ).join('')} {pop.toFixed(1)}/5</p>
-      <div>
-        {colors.map(c => <button key={c} onClick={()=>setColor(c)}>{c}</button>)}
+    <div style={{ border: '1px solid #ccc', borderRadius: '10px', padding: '15px', width: '250px' }}>
+      <Swiper
+        modules={[Navigation]}
+        navigation
+        onSlideChange={(swiper) => {
+          const colorKey = colorKeys[swiper.activeIndex];
+          setSelectedColor(colorKey);
+        }}
+        onSwiper={(swiper) => {
+          swiperRef.current = swiper;
+        }}
+        style={{ marginBottom: '10px' }}
+      >
+        {colorKeys.map((color) => (
+          <SwiperSlide key={color}>
+            <img
+              src={transformedColors[color].image}
+              alt={product.name}
+              width="100%"
+              style={{ borderRadius: '10px' }}
+              onError={(e) => {
+                e.target.src = 'https://via.placeholder.com/250x250?text=No+Image';
+              }}
+            />
+          </SwiperSlide>
+        ))}
+      </Swiper>
+
+      {/* color dots */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '10px' }}>
+        {colorKeys.map((color, index) => (
+          <div
+            key={color}
+            onClick={() => {
+              setSelectedColor(color);
+              swiperRef.current?.slideTo(index);
+            }}
+            style={{
+              width: '20px',
+              height: '20px',
+              borderRadius: '50%',
+              backgroundColor: colorMap[color],
+              border: selectedColor === color ? '2px solid black' : '1px solid gray',
+              cursor: 'pointer'
+            }}
+          />
+        ))}
       </div>
+
+      {/* color name */}
+      <p style={{ textAlign: 'center', fontWeight: '500', margin: '8px 0' }}>
+        {selectedColor.charAt(0).toUpperCase() + selectedColor.slice(1)} Gold
+      </p>
+
+      {/* Rating */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', marginBottom: '10px' }}>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <span key={i} style={{ fontSize: '18px', color: '#FFD700' }}>
+            {i + 1 <= Math.floor(selectedVariant.popularityOutOfFive)
+              ? '★'
+              : i < selectedVariant.popularityOutOfFive
+              ? '⯪'
+              : '☆'}
+          </span>
+        ))}
+        <span style={{ fontWeight: '500' }}>{selectedVariant.popularityOutOfFive}/5</span>
+      </div>
+
+      <h3>{product.name}</h3>
+      <p><strong>Price:</strong> {selectedVariant.price} USD</p>
     </div>
   );
 };
