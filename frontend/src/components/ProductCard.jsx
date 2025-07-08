@@ -1,105 +1,71 @@
-import React, { useState, useRef } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import { Navigation } from 'swiper/modules';
+// server.js
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const axios = require('axios');
+const app = express();
+const PORT = process.env.PORT || 3001;
 
-const ProductCard = ({ product }) => {
-  const [selectedColor, setSelectedColor] = useState('yellow');
-  const swiperRef = useRef(null);
+const allowedOrigins = [
+  "https://renart-project.vercel.app",
+  "https://renart-frontend.vercel.app",
+  /^https:\/\/renart-project-.*-bayrambartus-projects\.vercel\.app$/,
+  "http://localhost:3000"
+];
 
-  const colorMap = {
-    yellow: '#E6CA97',
-    white: '#D9D9D9',
-    rose: '#E1A4A9'
-  };
-
-  // Backend'den gelen product.images, price, popularityScoreOutOf5 yapısını frontend'de dönüştürüyoruz
-  const transformedColors = {};
-  for (const color of Object.keys(product.images || {})) {
-    transformedColors[color] = {
-      image: product.images[color],
-      price: product.price,
-      popularityOutOfFive: product.popularityScoreOutOf5
-    };
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    const isAllowed = allowedOrigins.some(allowed =>
+      allowed instanceof RegExp ? allowed.test(origin) : allowed === origin
+    );
+    return isAllowed
+      ? callback(null, true)
+      : callback(new Error("Not allowed by CORS"));
   }
+}));
 
-  const colorKeys = Object.keys(transformedColors);
-  const selectedVariant = transformedColors[selectedColor];
+const products = require('./products.json');
 
-  return (
-    <div style={{ border: '1px solid #ccc', borderRadius: '10px', padding: '15px', width: '250px' }}>
-      <Swiper
-        modules={[Navigation]}
-        navigation
-        onSlideChange={(swiper) => {
-          const colorKey = colorKeys[swiper.activeIndex];
-          setSelectedColor(colorKey);
-        }}
-        onSwiper={(swiper) => {
-          swiperRef.current = swiper;
-        }}
-        style={{ marginBottom: '10px' }}
-      >
-        {colorKeys.map((color) => (
-          <SwiperSlide key={color}>
-            <img
-              src={transformedColors[color].image}
-              alt={product.name}
-              width="100%"
-              style={{ borderRadius: '10px' }}
-              onError={(e) => {
-                e.target.src = 'https://via.placeholder.com/250x250?text=No+Image';
-              }}
-            />
-          </SwiperSlide>
-        ))}
-      </Swiper>
+async function fetchGoldPrice() {
+  try {
+    const res = await axios.get('https://www.goldapi.io/api/XAU/USD', {
+      headers: {
+        'x-access-token': process.env.GOLD_API_KEY,
+        'Content-Type': 'application/json'
+      }
+    });
+    return (res.data.price / 31.1035).toFixed(2);
+  } catch (e) {
+    console.error("Altın fiyatı alınamadı:", e.message);
+    return 74.5;
+  }
+}
 
-      {/* color dots */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '10px' }}>
-        {colorKeys.map((color, index) => (
-          <div
-            key={color}
-            onClick={() => {
-              setSelectedColor(color);
-              swiperRef.current?.slideTo(index);
-            }}
-            style={{
-              width: '20px',
-              height: '20px',
-              borderRadius: '50%',
-              backgroundColor: colorMap[color],
-              border: selectedColor === color ? '2px solid black' : '1px solid gray',
-              cursor: 'pointer'
-            }}
-          />
-        ))}
-      </div>
+app.get('/api/products', async (req, res) => {
+  const goldPrice = await fetchGoldPrice();
 
-      {/* color name */}
-      <p style={{ textAlign: 'center', fontWeight: '500', margin: '8px 0' }}>
-        {selectedColor.charAt(0).toUpperCase() + selectedColor.slice(1)} Gold
-      </p>
+  const enrichedProducts = products.map(p => {
+    const enrichedColors = {};
+    for (const color in p.colors) {
+      const variant = p.colors[color];
+      const price = ((variant.popularityScore + 1) * variant.weight * goldPrice).toFixed(2);
+      const popularityOutOfFive = (variant.popularityScore / 0.2).toFixed(1);
+      enrichedColors[color] = {
+        ...variant,
+        price: parseFloat(price),
+        popularityOutOfFive: parseFloat(popularityOutOfFive)
+      };
+    }
+    return {
+      name: p.name,
+      colors: enrichedColors
+    };
+  });
 
-      {/* Rating */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', marginBottom: '10px' }}>
-        {Array.from({ length: 5 }).map((_, i) => (
-          <span key={i} style={{ fontSize: '18px', color: '#FFD700' }}>
-            {i + 1 <= Math.floor(selectedVariant.popularityOutOfFive)
-              ? '★'
-              : i < selectedVariant.popularityOutOfFive
-              ? '⯪'
-              : '☆'}
-          </span>
-        ))}
-        <span style={{ fontWeight: '500' }}>{selectedVariant.popularityOutOfFive}/5</span>
-      </div>
+  res.json(enrichedProducts);
+});
 
-      <h3>{product.name}</h3>
-      <p><strong>Price:</strong> {selectedVariant.price} USD</p>
-    </div>
-  );
-};
-
-export default ProductCard;
+app.listen(PORT, () => {
+  console.log(`✅ Backend running at http://localhost:${PORT}`);
+});
