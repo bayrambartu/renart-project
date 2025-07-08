@@ -6,7 +6,7 @@ Bu proje, Full-Stack geliştirme görev kapsamında hazırlanmış bir ürün li
 ##  Bağlantılar
 
 -  Github Repository: [renart-case](https://github.com/kullanici-adi/renart-case)  
--  Canlı Frontend (Vercel): [https://renart-project.vercel.app/](https://renart-frontend.vercel.app)  
+-  Canlı Frontend (Vercel): [https://renart-project.vercel.app/](https://renart-frontend.vercel.app)  -https://renart-project-git-main-bayrambartus-projects.vercel.app/
 -  Backend API (Yerel): `http://localhost:3001/products`  
 
 ##  Uygulama Özellikleri
