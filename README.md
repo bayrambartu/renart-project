@@ -1,4 +1,5 @@
-# Renart Case - Full Stack Ürün Listeleme Uygulaması
+<img width="1165" alt="image" src="https://github.com/user-attachments/assets/413bdfe3-06e7-44a1-876d-e376dbdb9793" /># Renart Case - Full Stack Ürün Listeleme Uygulaması
+![image](https://github.com/user-attachments/assets/e19c2f48-fa67-495a-80a2-4fc9a3fbd9c2)
 
 Bu proje, Full-Stack geliştirme görev kapsamında hazırlanmış bir ürün listeleme uygulamasıdır. Frontend React.js ile, Backend ise Node.js (Express) ile geliştirilmiştir.
 
@@ -40,5 +41,8 @@ cd backend
 npm install
 npm start
 # Sunucu http://localhost:3001 üzerinden çalışır
+
+
+
 
 
